@@ -18,8 +18,8 @@ def write_to_sheety(result: dict) -> None:
     today_date = datetime.now().strftime("%d/%m/%Y")
     now_time = datetime.now().strftime("%X")
 
-    headers = {
-        'Authorization': f'Basic {config.Authorization}',
+    bearer_headers = {
+        'Authorization': f'Bearer {config.Authorization}',
     }
 
     # [exercises.get("name"), exercises.get('duration_min'), exercises.get("nf_calories")]
@@ -34,7 +34,7 @@ def write_to_sheety(result: dict) -> None:
             }
         }
 
-        sheet_response = requests.post(sheet_endpoint, json=sheet_inputs, headers=headers)
+        sheet_response = requests.post(sheet_endpoint, json=sheet_inputs, headers=bearer_headers)
 
         print(sheet_response.text)
 
@@ -63,11 +63,13 @@ def get_calories(user_response: str) -> dict:
     return exercises
 
 
-def main():
-    exercise_and_calories = get_calories(user_response=input("What do yuo do today!\n"))
+def main(user_response):
+    exercise_and_calories = get_calories(user_response=user_response)
     print(exercise_and_calories)
     write_to_sheety(exercise_and_calories)
 
 
 if __name__ == '__main__':
-    main()
+    # user_response = input("What do yuo do today!\n")
+    user_answer = "Run 15 km swim 5 km"
+    main(user_answer)
