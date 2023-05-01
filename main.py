@@ -1,5 +1,5 @@
+import os
 import requests
-import config
 from datetime import datetime
 
 GENDER = "male"
@@ -7,9 +7,14 @@ WEIGHT = 88
 HEIGHT = 185
 AGE = 40
 
-USERNAME = config.USER
-PROJECT_NAME = config.PROJECT
-SHEETY_NAME = config.SHEETY
+
+USERNAME = os.environ.get("USER")
+PROJECT_NAME = os.environ.get("PROJECT")
+SHEETY_NAME = os.environ.get("SHEETY")
+
+SHEET_PASSWORD = os.environ.get("Authorization")
+APP_ID = os.environ.get("APP_ID")
+API_KEY = os.environ.get("API_KEY")
 
 
 def write_to_sheety(result: dict) -> None:
@@ -19,10 +24,9 @@ def write_to_sheety(result: dict) -> None:
     now_time = datetime.now().strftime("%X")
 
     bearer_headers = {
-        'Authorization': f'Bearer {config.Authorization}',
+        'Authorization': f'Bearer {SHEET_PASSWORD}',
     }
 
-    # [exercises.get("name"), exercises.get('duration_min'), exercises.get("nf_calories")]
     for exercise in result["exercises"]:
         sheet_inputs = {
             "workout": {
@@ -43,8 +47,8 @@ def get_calories(user_response: str) -> dict:
     nutritionix_endpoint = "https://trackapi.nutritionix.com/v2/natural/exercise"
 
     nutritionix_headers = {
-        'x-app-id': config.APP_ID,
-        'x-app-key': config.API_KEY,
+        'x-app-id': APP_ID,
+        'x-app-key': API_KEY,
     }
 
     nutritionix_config = {
@@ -58,7 +62,7 @@ def get_calories(user_response: str) -> dict:
     response = requests.post(url=nutritionix_endpoint,
                              json=nutritionix_config,
                              headers=nutritionix_headers)
-    # print(response.json())
+
     exercises = response.json()
     return exercises
 
@@ -70,6 +74,6 @@ def main(user_response):
 
 
 if __name__ == '__main__':
-    # user_response = input("What do yuo do today!\n")
-    user_answer = "Run 15 km swim 5 km"
+    user_answer = input("What do yuo do today!\n")
+    # user_answer = "Run 15 km swim 5 km"
     main(user_answer)
